@@ -1,7 +1,7 @@
 import sys
 import os
 
-print("這是測試檔案")
+print("這是測試檔案123123123123")
 
 def bad_function( a,b,c ):
     result=a+b*c
