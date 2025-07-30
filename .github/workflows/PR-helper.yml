@@ -1,31 +1,32 @@
 name: PR Comment Auto Modify
 on:
   issue_comment:
-    types: [created, edited]  # 當有新的評論創建時觸發
+    types: [created]  # 當有新的評論創建時觸發
   pull_request_review_comment:
-    types: [created, edited]
+    types: [created]
 jobs:
   auto-modify:
-    if: > 
-      github.event.issue.pull_request && 
-      (contains(github.event.comment.body, '添加修改') || 
-       contains(github.event.comment.body, '重新修改') || 
-       contains(github.event.comment.body, '刪除修改'))
+    if: github.event.issue.pull_request || github.event.pull_request
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v3
         with:
-          persist-credentials: true   # 確保可以推送回遠端
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-      - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "Auto Mod Bot"
+          git config --global user.email "bot@example.com"
 
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -35,9 +36,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_ENDPOINT_URL: ${{ secrets.OPENAI_ENDPOINT_URL }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: python auto_mod_tool.py
-
-      - name: Push to branch
-        run: gh pr create -B $(git rev-parse --abbrev-ref HEAD | sed 's/^bot\///') -H $(git rev-parse --abbrev-ref HEAD) --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
