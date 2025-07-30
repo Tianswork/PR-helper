@@ -55,7 +55,15 @@ def handle_pr_comments():
     return threads
 
 def get_ai_fix_file_content(comment, file):
-    prompt = f"""You will get the whole fileModify the file according to the PR comment requirements.
+    # Read local specification file
+    try:
+        with open(os.path.join(os.path.dirname(__file__), 'prompt.md'), 'r', encoding='utf-8') as f:
+            specification = f.read()
+    except FileNotFoundError:
+        logger.warning("prompt.md not found, using default specification")
+        specification = "Follow standard coding practices and the suggestions in the PR comments."
+    
+    prompt = f"""You will get the whole file. Modify the file according to the PR comment requirements.
 
 file content:
 ```{file}```
@@ -63,8 +71,8 @@ file content:
 PR comment:
 ```{comment}```
 
-Your modifacation should follow the the specification write on the following page
-https://trend-yanbin-lin.github.io/publish-style-guide/
+Your modification should follow the specification below:
+{specification}
 
 Just provide the revised file content directly, without saying anything else.
 The following is example:

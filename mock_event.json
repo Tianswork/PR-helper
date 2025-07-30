@@ -1,0 +1,14 @@
+{
+  "action": "created",
+  "issue": {
+    "number": 1,
+    "comments_url": "https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/issues/1/comments",
+    "pull_request": {
+      "url": "https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/pulls/1"
+    }
+  },
+  "comment": {
+    "body": "請修改這行程式碼",
+    "created_at": "2025-01-30T12:00:00Z"
+  }
+}
